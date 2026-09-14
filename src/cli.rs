@@ -37,6 +37,10 @@ pub struct Cli {
     #[arg(long)]
     pub dry_run: bool,
 
+    /// Automatically initialize the target directory with 'git init' if it does not exist
+    #[arg(long)]
+    pub init: bool,
+
     /// Run in interactive mode
     #[arg(long)]
     pub interactive: bool,

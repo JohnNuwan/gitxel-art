@@ -8,7 +8,7 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use cli::Cli;
 use colored::*;
-use git_bot::{generate_commits, push_commits, validate_git_repo, CommitConfig};
+use git_bot::{ensure_git_repo, generate_commits, push_commits, CommitConfig};
 use image_proc::image_to_commit_grid;
 use preview::render_graph_preview;
 use prompt::run_interactive_wizard;
@@ -104,7 +104,7 @@ fn main() -> Result<()> {
     }
 
     if !dry_run {
-        validate_git_repo(&repo_path)?;
+        ensure_git_repo(&repo_path, cli.init)?;
     }
 
     println!(

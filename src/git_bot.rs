@@ -20,19 +20,58 @@ pub fn get_first_sunday_of_year(year: i32) -> Result<NaiveDate> {
     Ok(date)
 }
 
-/// Verify that the target path is a valid Git repository.
-pub fn validate_git_repo<P: AsRef<Path>>(repo_path: P) -> Result<()> {
+/// Verify or initialize the target Git repository.
+pub fn ensure_git_repo<P: AsRef<Path>>(repo_path: P, auto_init: bool) -> Result<()> {
     let path = repo_path.as_ref();
     if !path.exists() {
-        return Err(anyhow!("Specified path does not exist: {}", path.display()));
+        if auto_init {
+            println!("Target directory does not exist. Creating: {}", path.display());
+            std::fs::create_dir_all(path)
+                .with_context(|| format!("Failed to create directory: {}", path.display()))?;
+        } else {
+            return Err(anyhow!(
+                "Specified path does not exist: {}\nHint: Create the folder first or use --init to create and initialize it automatically.",
+                path.display()
+            ));
+        }
     }
+
     if !path.join(".git").exists() {
-        return Err(anyhow!(
-            "Specified path is not a Git repository (missing .git folder): {}",
-            path.display()
-        ));
+        if auto_init {
+            println!("Initializing new Git repository in: {}", path.display());
+            let init_output = Command::new("git")
+                .arg("-C")
+                .arg(path)
+                .arg("init")
+                .output()
+                .context("Failed to run 'git init'")?;
+
+            if !init_output.status.success() {
+                let stderr = String::from_utf8_lossy(&init_output.stderr);
+                return Err(anyhow!("'git init' failed:\n{}", stderr));
+            }
+
+            // Set main branch
+            let _ = Command::new("git")
+                .arg("-C")
+                .arg(path)
+                .arg("branch")
+                .arg("-M")
+                .arg("main")
+                .output();
+        } else {
+            return Err(anyhow!(
+                "Specified path is not a Git repository (missing .git folder): {}\nHint: Run 'git init' inside the directory or use --init to initialize it automatically.",
+                path.display()
+            ));
+        }
     }
     Ok(())
+}
+
+/// Verify that the target path is a valid Git repository.
+pub fn validate_git_repo<P: AsRef<Path>>(repo_path: P) -> Result<()> {
+    ensure_git_repo(repo_path, false)
 }
 
 /// Parameters required to execute commit generation.
