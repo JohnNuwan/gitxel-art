@@ -2,7 +2,7 @@
 name = "gitxel-art"
 version = "0.2.0"
 edition = "2021"
-authors = ["Tanguy Pauwels", "John Moncel"]
+authors = ["Tanguy Pauwels", "Aza"]
 description = "Turn your GitHub contribution graph into pixel art using automated backdated commits"
 license = "MIT"
 

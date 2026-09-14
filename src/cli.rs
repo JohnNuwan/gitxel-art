@@ -4,7 +4,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(
     name = "gitxel-art",
-    author = "Tanguy Pauwels, John Moncel",
+    author = "Tanguy Pauwels, Aza",
     version = "0.2.0",
     about = "Create pixel art in your GitHub contribution calendar using automated backdated commits"
 )]
