@@ -50,97 +50,75 @@ After:
 ![github_before](media/github_after.png)
 
 
-## Installation and setup
+## Installation & Build (Rust)
 
-### Setup Gitxel-Art
+Gitxel-Art is rewritten in **Rust** for maximum speed, zero external runtime dependencies (no Python or Matplotlib required), and a rich terminal experience.
 
-git clone [url-repo]
+### Prerequisites
 
-#### Activate a virtual Environment
+Ensure you have Rust and Cargo installed:
+- [Install Rust](https://rustup.rs/)
 
-##### For Unix-based systems (Linux | macOS)
-
-```shell
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-##### Windows system 
+### Build the project
 
 ```shell
-python -m venv .venv
-.\.venv\Scripts\activate
+git clone <url-repo>
+cd gitxel-art
+cargo build --release
 ```
 
-#### Install Dependencies
+The compiled standalone binary will be available at `./target/release/gitxel-art` (or `gitxel-art.exe` on Windows).
 
-Once the virtual environment is activated, install the required dependencies:
+## Usage
 
+### Interactive Wizard Mode
+
+Simply launch the binary without arguments to enter the interactive setup:
 
 ```shell
-pip install -r requirements.txt
+cargo run --release
+# or directly:
+./target/release/gitxel-art
 ```
 
+The wizard will guide you through:
+1. Selecting a pixel art template (from `./pixel_art/` or a custom image)
+2. Specifying the target local Git repository
+3. Setting the dummy file name (default: `dummy.txt`)
+4. Choosing the target year (e.g. `2024`)
+5. Choosing your action: preview in terminal, generate commits locally, or dry-run simulation
 
-### Setup your GitHub Repository:
-This repository will be used to push the commits that generate your pixel art.
+### CLI Arguments (Fast & CI/CD friendly)
 
-Create a New Repository:
-- Go to your GitHub profile and create a new repository (Private is recommended).
-- Make sure to choose a name that fits your project, for example, dummy_repo.
-
-#### Initialize the Repository
+You can also run non-interactively with CLI flags:
 
 ```shell
-git init
-git branch -M main
-git remote set-url origin [your-github-repo-url]```
+# Terminal TrueColor preview only (no commits created)
+./target/release/gitxel-art --image ./pixel_art/Space_invader.jpg --preview
 
+# Simulate commit generation with a progress bar without touching any files
+./target/release/gitxel-art --image ./pixel_art/pac_man.png --repo /path/to/dummy_repo --year 2024 --dry-run
+
+# Generate commits on a local repository
+./target/release/gitxel-art --image ./pixel_art/pokemon.png --repo /path/to/dummy_repo --year 2024
+
+# Automatically push to origin/main after generation
+./target/release/gitxel-art --image ./pixel_art/pokemon.png --repo /path/to/dummy_repo --year 2024 --push
 ```
 
+### CLI Options
 
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-i, --image <FILE>` | Path to image (PNG/JPEG, max 49x7) | `./pixel_art/Space_invader.jpg` |
+| `-r, --repo <DIR>` | Target local Git repository | Current directory |
+| `-y, --year <YEAR>` | Target contribution year ($\ge 1974$) | `2024` |
+| `-d, --dummy-file <NAME>` | Name of dummy file | `dummy.txt` |
+| `-p, --preview` | Preview TrueColor calendar in terminal | `false` |
+| `--dry-run` | Simulate commit creation without writing | `false` |
+| `--push` | Push to `origin/main` automatically | `false` |
+| `--interactive` | Force interactive prompt wizard | `false` |
 
-#### Configure Git (if it's your first time using Git)
-
-If you haven't used Git before, set up your global Git configuration with your name and email:
-
-```shell
-git config --global user.name "John Doe"
-git config --global user.email johndoe@example.com
-```
-**/!\ The email you use must match the email associated with your GitHub account.**
-
-## Usage 
-
-To run Gitxel-Art, simply execute the following command:
-
-```shell
-python main.py
-```
-Ouput:
-
-![img](media/launch.png)
-
-- If you don't specify an image path, the script will automatically use the default Space Invader image:
-
-![img2](media/default_image.png)
-
-- You don't need to convert your image to grayscale; the script will handle this for you.
-
-The script will guide you through a series of questions:
-
-![img3](media/all_steps.png)
-
-If you respond `yes` to the last question (`Do you want to run in preview mode`)
-
-the script will generate a mock GitHub contributions graph for you to preview your art:
-If you want to apply your image on your github profile 
-you have to re-run the script with the same parameters and answer `not` to the last question.
-![img4](media/mocked_graph.png)
-
-If you choose not to run in preview mode, the script will create the corresponding commits and push them to your GitHub profile:
-
-![img5](media/commit_push.png)
 
 Then, you will see your beautiful artwork displayed on your GitHub profile:
 

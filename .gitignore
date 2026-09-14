@@ -47,4 +47,5 @@ coverage.xml
 *.bak
 *.tmp
 
-
+# Rust
+/target/

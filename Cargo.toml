@@ -1,0 +1,16 @@
+[package]
+name = "gitxel-art"
+version = "0.2.0"
+edition = "2021"
+authors = ["Tanguy Pauwels", "John Moncel"]
+description = "Turn your GitHub contribution graph into pixel art using automated backdated commits"
+license = "MIT"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+chrono = "0.4"
+inquire = "0.7"
+indicatif = "0.17"
+colored = "2.1"
+anyhow = "1.0"
