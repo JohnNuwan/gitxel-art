@@ -133,14 +133,49 @@ fn main() -> Result<()> {
     println!("\n{}", "Generating commits...".bold());
     let commits_count = generate_commits(&commit_grid, &config)?;
 
+    let has_remote_origin = std::process::Command::new("git")
+        .arg("-C")
+        .arg(&repo_path)
+        .arg("remote")
+        .arg("get-url")
+        .arg("origin")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
+
     if commits_count > 0 && push && !dry_run {
-        push_commits(&repo_path)?;
+        if has_remote_origin {
+            push_commits(&repo_path)?;
+        } else {
+            println!(
+                "\n{} Cannot push: no remote 'origin' is configured for this repository.\n\
+                 First add your remote using:\n  git -C \"{}\" remote add origin <URL>\n\
+                 Then push using:\n  git -C \"{}\" push -u origin main",
+                "WARNING:".bold().yellow(),
+                repo_path.display(),
+                repo_path.display()
+            );
+        }
     } else if commits_count > 0 && !dry_run {
-        println!(
-            "\n{} Commits created locally. You can push them using: {}",
-            "INFO:".bold().cyan(),
-            format!("git -C \"{}\" push origin main", repo_path.display()).yellow()
-        );
+        if has_remote_origin {
+            println!(
+                "\n{} Commits created locally. You can push them using:\n  {}",
+                "INFO:".bold().cyan(),
+                format!("git -C \"{}\" push origin main", repo_path.display()).yellow()
+            );
+        } else {
+            println!(
+                "\n{} Commits created locally in: {}\n\
+                 To display them on your GitHub profile, link a GitHub repository:\n  \
+                 1. Create a repository on GitHub (private recommended)\n  \
+                 2. Link it:  {}\n  \
+                 3. Push it:  {}",
+                "SUCCESS:".bold().green(),
+                repo_path.display().to_string().cyan(),
+                format!("git -C \"{}\" remote add origin https://github.com/<username>/<repo>.git", repo_path.display()).yellow(),
+                format!("git -C \"{}\" push -u origin main", repo_path.display()).yellow()
+            );
+        }
     }
 
     println!("\n{}", "Done! ✨".bold().green());
