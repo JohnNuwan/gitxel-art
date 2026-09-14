@@ -29,6 +29,10 @@ pub struct Cli {
     #[arg(short, long)]
     pub preview: bool,
 
+    /// Commit multiplier per pixel (boosts visibility on years with high existing activity)
+    #[arg(short, long, default_value_t = 1)]
+    pub multiplier: usize,
+
     /// Automatically push commits to origin/main after generation
     #[arg(long)]
     pub push: bool,

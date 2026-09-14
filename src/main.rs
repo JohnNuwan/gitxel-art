@@ -92,8 +92,21 @@ fn main() -> Result<()> {
         image_path.display().to_string().cyan()
     );
 
-    let commit_grid = image_to_commit_grid(&image_path)
+    let mut commit_grid = image_to_commit_grid(&image_path)
         .with_context(|| format!("Failed to process image: {}", image_path.display()))?;
+
+    if cli.multiplier > 1 {
+        println!(
+            "{} Applying commit multiplier: {}x",
+            "==>".bold().green(),
+            cli.multiplier.to_string().cyan()
+        );
+        for row in &mut commit_grid {
+            for commits in row {
+                *commits *= cli.multiplier;
+            }
+        }
+    }
 
     // Render TrueColor terminal preview
     render_graph_preview(&commit_grid);
